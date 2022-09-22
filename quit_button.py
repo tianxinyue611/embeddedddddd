@@ -1,12 +1,18 @@
 import pygame
 import os
 from pygame.locals import *
+import time
+import RPi.GPIO as GPIO
 
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb1')
 #os.putenv('SDL_MOUSEDRV','TSLIB')
 #os.putenv('SDL_MOUSEDEV','/dev/input/touchscreen')
 
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(27,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+
+start_time = time.time()
 pygame.init()
 
 pygame.mouse.set_visible(True)
@@ -41,6 +47,13 @@ while code_run:
                 if(rect.collidepoint(pos)):
                     if(my_text == 'quit'):
                         code_run = False
+
+
+    if not GPIO.input(27):
+        code_run = False
+
+    if time.time()-start_time>30:
+        code_run = False
 
 
 pygame.quit()
