@@ -9,15 +9,16 @@ code_run = True
 GPIO.setup(13, GPIO.OUT)
 
 # initialize f and duty cycle
-frequency = 50
-dc = 50
+frequency = 1
+dc = 80
+
+# initial frequency is 1Hz
+p = GPIO.PWM(13, frequency)
+
+# initial duty cycle is 50%
+p.start(dc)
 
 while code_run:
-    # initial frequency is 1Hz
-    p = GPIO.PWM(13, frequency)
-
-    # initial duty cycle is 50%
-    p.start(dc)
 
     # quit the program when button 27 pressed
     if not GPIO.input(27):
@@ -25,4 +26,3 @@ while code_run:
 
 p.stop()
 GPIO.cleanup()
-

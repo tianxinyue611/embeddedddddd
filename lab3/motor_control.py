@@ -4,18 +4,18 @@ import time
 print("motor control program starts......")
 
 # GPIO used for motor A
-# GPIO ? and GPIO ? are used to control direction
+# GPIO 5 and GPIO 6 are used to control direction
 AIN1 = 5
 AIN2 = 6
 # GPIO 13 is used for PWM control
 PWMA = 13
 # GPIO ? is used for standby
-STB = 22
+#STB = 22
 
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(STB, GPIO.OUT)
+#GPIO.setup(STB, GPIO.OUT)
 # for motor A
 GPIO.setup(PWMA, GPIO.OUT)
 GPIO.setup(AIN1, GPIO.OUT)
@@ -34,7 +34,7 @@ pA.start(0)
 
 def clockwise(p, dc):
     p.ChangeDutyCycle(dc)
-    GPIO.output(STB, GPIO.HIGH)
+    #GPIO.output(STB, GPIO.HIGH)
     GPIO.output(AIN1, GPIO.HIGH)
     GPIO.output(AIN2, GPIO.LOW)
     return None
@@ -42,18 +42,19 @@ def clockwise(p, dc):
 
 def counterclockwise(p, dc):
     p.ChangeDutyCycle(dc)
-    GPIO.output(STB, GPIO.HIGH)
-    GPIO.output(AIN1, GPIO.LOW)
+    #GPIO.output(STB, GPIO.HIGH)
     GPIO.output(AIN2, GPIO.HIGH)
+    GPIO.output(AIN1, GPIO.LOW)
     return None
 
-def stop():
-    GPIO.output(STB, GPIO.LOW)
+def stop(p):
+    #GPIO.output(STB, GPIO.LOW)
+    p.ChangeDutyCycle(0)
     return None
 
 # main
 print("stop in clockwise")
-stop()
+stop(pA)
 time.sleep(3)
 
 print("half-speed in clockwise")
@@ -65,7 +66,7 @@ clockwise(pA, full_dc)
 time.sleep(3)
 
 print("stop in counterclockwise")
-stop()
+stop(pA)
 time.sleep(3)
 
 print("half-speed in counterclockwise")
@@ -77,6 +78,10 @@ counterclockwise(pA, full_dc)
 time.sleep(3)
 
 print("program quit")
-stop()
+stop(pA)
 pA.stop()
+
+GPIO.output(AIN2, GPIO.LOW)
+GPIO.output(AIN1, GPIO.LOW)
+
 GPIO.cleanup()
