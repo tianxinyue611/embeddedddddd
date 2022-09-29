@@ -72,7 +72,7 @@ print("half-speed in counterclockwise")
 counterclockwise(pA, half_dc)
 time.sleep(3)
 
-print("half-speed in counterclockwise")
+print("full-speed in counterclockwise")
 counterclockwise(pA, full_dc)
 time.sleep(3)
 
