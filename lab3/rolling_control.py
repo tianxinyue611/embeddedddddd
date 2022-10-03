@@ -108,7 +108,7 @@ def stop(p,queue,time_q):
     queue.pop(0)
     queue.append('Stop')
     time_q.pop(0)
-    time_q.append(str(0))
+    time_q.append(str(int(time.time() - start_time)))
     return None
 
 # function to display buttons
