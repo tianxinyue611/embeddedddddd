@@ -83,14 +83,14 @@ def initailize_queues():
 initailize_queues()
 
 # functions to control motor
-def clockwise(p, dc, in1, in2, queue, time):
+def clockwise(p, dc, in1, in2, queue, time_q):
     p.ChangeDutyCycle(dc)
     GPIO.output(in1, GPIO.HIGH)
     GPIO.output(in2, GPIO.LOW)
     queue.pop(0)
     queue.append('ClkWise')
-    time.pop(0)
-    time.append(str(int(time.time() - start_time)))
+    time_q.pop(0)
+    time_q.append(str(int(time.time() - start_time)))
     return None
 
 def counterclockwise(p, dc, in1, in2,queue,time_q):
