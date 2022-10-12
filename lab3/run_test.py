@@ -20,10 +20,10 @@ AIN2 = 6
 # GPIO 13 is used for PWMA control
 PWMA = 13
 # GPIO used for motor B
-# GPIO 24 and GPIO 25 are used to control direction
+# GPIO 20 and GPIO 21 are used to control direction
 BIN1 = 20
 BIN2 = 21
-# GPIO 18 is used for PWMA control
+# GPIO 12 is used for PWMA control
 PWMB = 12
 
 # Set up GPIO
@@ -57,7 +57,7 @@ screen = pygame.display.set_mode((320,240))
 panic_font = pygame.font.Font(None,50)
 text_font = pygame.font.Font(None,20)
 
-main_buttons = {'STOP': (160, 120), 'RESUME': (160, 120), 'quit':(280, 200)}
+main_buttons = {'STOP': (160, 120), 'RESUME': (160, 120), 'quit':(280, 200),'start':(100,200)}
 direction_text = ['Stop', 'ClkWise', 'Counter-Clk']
 main_buttons_rect = {}
 
@@ -86,8 +86,8 @@ initailize_queues()
 # functions to control motor
 def clockwise(p, dc, in1, in2, queue, time_q):
     p.ChangeDutyCycle(dc)
-    GPIO.output(in1, GPIO.HIGH)
-    GPIO.output(in2, GPIO.LOW)
+    GPIO.output(in1, GPIO.LOW)
+    GPIO.output(in2, GPIO.HIGH)
     queue.pop(0)
     queue.append('ClkWise')
     time_q.pop(0)
@@ -96,8 +96,8 @@ def clockwise(p, dc, in1, in2, queue, time_q):
 
 def counterclockwise(p, dc, in1, in2,queue,time_q):
     p.ChangeDutyCycle(dc)
-    GPIO.output(in2, GPIO.HIGH)
-    GPIO.output(in1, GPIO.LOW)
+    GPIO.output(in2, GPIO.LOW)
+    GPIO.output(in1, GPIO.HIGH)
     queue.pop(0)
     queue.append('Counter-Clk')
     time_q.pop(0)
@@ -122,6 +122,7 @@ def render_button(word, center, font):
     return None
 
 
+
 # initialize f and duty cycle
 frequency = 50
 stop_dc = 0
@@ -136,11 +137,13 @@ pB.start(0)
 p = pB
 
 # get start time
-start_time = time.time()
+
 
 # main part of the rolling control
 code_run = True
+start = False
 button_text = 'STOP'
+time_start = time.time()
 while code_run:
     # initialize the layout
     screen.fill(BLACK)
@@ -156,6 +159,7 @@ while code_run:
     # display buttons: stop & quit
     render_button(button_text, main_buttons[button_text], panic_font)
     render_button('quit', main_buttons['quit'], panic_font)
+    render_button('start', main_buttons['start'], panic_font)
     
     
  
@@ -183,6 +187,50 @@ while code_run:
                 if rect.collidepoint(pos):
                     if my_text == 'quit':
                         code_run = False
+                        
+                    if my_text == 'start':
+                        start = True
+                        start_time = time.time()
+                        current_state = "forward"
+                        '''
+                        while start:
+                            clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
+                            clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
+                            time.sleep(3)
+                            stop(pA, queue_A, time_A)
+                            stop(pB, queue_B, time_B)
+                            time.sleep(2)
+                            counterclockwise(pA, full_dc, AIN1, AIN2, queue_A,time_A)
+                            counterclockwise(pB, full_dc, BIN1, BIN2, queue_B,time_B)
+                            time.sleep(3)
+                            stop(pA, queue_A, time_A)
+                            stop(pB, queue_B, time_B)
+                            time.sleep(2)
+                            clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
+                            clockwise(pB, half_dc, BIN1, BIN2,queue_B,time_B)
+                            time.sleep(3)
+                            stop(pA, queue_A, time_A)
+                            stop(pB, queue_B, time_B)
+                            time.sleep(2)
+                            clockwise(pA, half_dc, AIN1, AIN2,queue_A,time_A)
+                            clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
+                            time.sleep(3)
+                            stop(pA, queue_A, time_A)
+                            stop(pB, queue_B, time_B)
+                            time.sleep(2)
+                            
+                            time_now = time.time()
+                            
+                            if time_start-time_now>30:
+                                start = False
+                                
+                                
+                            if not GPIO.input(27):
+                                code_run = False
+                                time.sleep(0.4)
+                                                     
+                           '''
+                        
 
                     if my_text=='STOP':
                         stop(pA, queue_A, time_A)
@@ -194,42 +242,57 @@ while code_run:
                         button_text = 'STOP'
                         start_time = time.time()
                         
+    
+
+    if start == True and current_state == "forward":
+        forward_start = time.time()
+        clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
+        clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
+        
+
+        
+    if start == True and current_state == "stop":
+        stop(pA, queue_A, time_A)
+        stop(pB, queue_B, time_B)
+        
+    if start == True and current_state == "backward":
+        counterclockwise(pA, full_dc, AIN1, AIN2, queue_A,time_A)
+        counterclockwise(pB, full_dc, BIN1, BIN2, queue_B,time_B)
+    
+    if start == True and current_state == "left":
+        clockwise(pA, half_dc, AIN1, AIN2,queue_A,time_A)
+        clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
+    if start == True and current_state == "right":
+        clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
+        clockwise(pB, half_dc, BIN1, BIN2,queue_B,time_B)        
+
+    if start == True and (time.time() - start_time)%24 > 0 and (time.time() - start_time)%24 < 3:
+        current_state = "forward"
+    
+    if start == True and (time.time() - start_time)%24 > 3 and (time.time() - start_time)%24 < 6:
+        current_state = "stop"
+
+    if start == True and (time.time() - start_time)%24 > 6 and (time.time() - start_time)%24 < 9:
+        current_state = "backward"
+    if start == True and (time.time() - start_time)%24 > 9 and (time.time() - start_time)%24 < 12:
+        current_state = "stop"
+    if start == True and (time.time() - start_time)%24 > 12 and (time.time() - start_time)%24 < 15:
+        current_state = "left"
+        
+    if start == True and (time.time() - start_time)%24 > 15 and (time.time() - start_time)%24 < 18:
+        current_state = "stop"
+    if start == True and (time.time() - start_time)%24 > 18 and (time.time() - start_time)%24 < 21:
+        current_state = "right"    
+
+    if start == True and (time.time() - start_time)%24 > 21 and (time.time() - start_time)%24 < 24:
+        current_state = "stop"
     pygame.display.flip()
-
     
     
-    if not GPIO.input(17):
-        time.sleep(0.4)
-        if p == pA:
-            p = pB
-
-        elif p == pB:
-            p = pA
-
-    
-    
-    if not GPIO.input(22):
-        time.sleep(0.4)
-        if p == pA:
-            clockwise(p, half_dc, AIN1, AIN2,queue_A,time_A)
-        if p == pB:
-            clockwise(p, half_dc, BIN1, BIN2,queue_B,time_B)
-
-    if not GPIO.input(23):
-        time.sleep(0.4)
-        if p == pA:
-            counterclockwise(p, half_dc, AIN1, AIN2, queue_A,time_A)
-        if p == pB:
-            counterclockwise(p, half_dc, BIN1, BIN2, queue_B,time_B)
-
     if not GPIO.input(27):
-        time.sleep(0.4)
-        if p == pA:
-            stop(p, queue_A, time_A)
-        if p == pB:
-            stop(p, queue_B, time_B)
-           
-    if time.time()-start_time>60:
+        code_run = False
+        
+    if time.time()-time_start>60:
         code_run = False;
         
 
