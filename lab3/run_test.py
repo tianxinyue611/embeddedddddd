@@ -128,14 +128,14 @@ frequency = 50
 stop_dc = 0
 half_dc = 50
 full_dc = 100
-
+past_state = 'stop'
 # initialize pA and pB, the motor should be stopped at initial
 pA = GPIO.PWM(PWMA, frequency)
 pA.start(0)
 pB = GPIO.PWM(PWMB, frequency)
 pB.start(0)
 p = pB
-
+flag = 1
 # get start time
 
 
@@ -219,73 +219,94 @@ while code_run:
                             stop(pB, queue_B, time_B)
                             time.sleep(2)
                             
-                            time_now = time.time()
-                            
-                            if time_start-time_now>30:
-                                start = False
+                         
                                 
                                 
                             if not GPIO.input(27):
-                                code_run = False
                                 time.sleep(0.4)
-                                                     
-                           '''
+                                start = False
+                                code_run = False
+                           '''     
+                                                 
+                           
                         
 
                     if my_text=='STOP':
+                        print("stop")
                         stop(pA, queue_A, time_A)
                         stop(pB, queue_B, time_B)
-                        initailize_queues()
-                        button_text = 'RESUME'
-
-                    if my_text=='RESUME':
-                        button_text = 'STOP'
-                        start_time = time.time()
                         
+                        flag = 0
+                        #time.sleep(0.5)
+                        button_text = 'RESUME'
+                        #stop(pA, queue_A, time_A)
+                        #stop(pB, queue_B, time_B)
+                        #initailize_queues()
+                        #button_text = 'RESUME'
+                        
+                    elif my_text=='RESUME':
+                        print("resume")
+                        
+                        flag = 1
+                    
+                        #start_time = time.time()
+                        past_state = None
+                        #time.sleep(0.5)
+                        button_text = 'STOP'
     
-
-    if start == True and current_state == "forward":
+    
+    
+    
+    if start == True and current_state == "forward" and current_state != past_state:
         forward_start = time.time()
         clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
         clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
+        past_state = "forward"
         
 
         
-    if start == True and current_state == "stop":
+    if start == True and current_state == "stop" and current_state != past_state:
         stop(pA, queue_A, time_A)
         stop(pB, queue_B, time_B)
+        past_state = "stop"
         
-    if start == True and current_state == "backward":
+    if start == True and current_state == "backward" and current_state != past_state:
         counterclockwise(pA, full_dc, AIN1, AIN2, queue_A,time_A)
         counterclockwise(pB, full_dc, BIN1, BIN2, queue_B,time_B)
-    
-    if start == True and current_state == "left":
+        past_state = "backward"
+    if start == True and current_state == "left" and current_state != past_state:
         clockwise(pA, half_dc, AIN1, AIN2,queue_A,time_A)
         clockwise(pB, full_dc, BIN1, BIN2,queue_B,time_B)
-    if start == True and current_state == "right":
+        past_state = "left"
+    if start == True and current_state == "right" and current_state != past_state:
         clockwise(pA, full_dc, AIN1, AIN2,queue_A,time_A)
         clockwise(pB, half_dc, BIN1, BIN2,queue_B,time_B)        
-
-    if start == True and (time.time() - start_time)%24 > 0 and (time.time() - start_time)%24 < 3:
+        past_state = "right"
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 0 and (time.time() - start_time)%24 < 3:
         current_state = "forward"
-    
-    if start == True and (time.time() - start_time)%24 > 3 and (time.time() - start_time)%24 < 6:
+        
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 3 and (time.time() - start_time)%24 < 6:
         current_state = "stop"
-
-    if start == True and (time.time() - start_time)%24 > 6 and (time.time() - start_time)%24 < 9:
+        
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 6 and (time.time() - start_time)%24 < 9:
         current_state = "backward"
-    if start == True and (time.time() - start_time)%24 > 9 and (time.time() - start_time)%24 < 12:
+        
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 9 and (time.time() - start_time)%24 < 12:
         current_state = "stop"
-    if start == True and (time.time() - start_time)%24 > 12 and (time.time() - start_time)%24 < 15:
+        
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 12 and (time.time() - start_time)%24 < 15:
         current_state = "left"
         
-    if start == True and (time.time() - start_time)%24 > 15 and (time.time() - start_time)%24 < 18:
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 15 and (time.time() - start_time)%24 < 18:
         current_state = "stop"
-    if start == True and (time.time() - start_time)%24 > 18 and (time.time() - start_time)%24 < 21:
+    
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 18 and (time.time() - start_time)%24 < 21:
         current_state = "right"    
-
-    if start == True and (time.time() - start_time)%24 > 21 and (time.time() - start_time)%24 < 24:
+        
+    if flag == 1 and start == True and (time.time() - start_time)%24 > 21 and (time.time() - start_time)%24 < 24:
         current_state = "stop"
+        
+    
     pygame.display.flip()
     
     
@@ -293,7 +314,7 @@ while code_run:
         code_run = False
         
     if time.time()-time_start>60:
-        code_run = False;
+        code_run = True
         
 
 
