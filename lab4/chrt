@@ -1,0 +1,19 @@
+1.internal=500000
+pi@jx98-ty293-xz785:~ $ chrt -p 5456
+pid 5456's current scheduling policy: SCHED_FIFO
+pid 5456's current scheduling priority: 49
+2.interval=2500 loaded
+pi@jx98-ty293-xz785:~/lab4 $ chrt -p 6089
+pid 6089's current scheduling policy: SCHED_FIFO
+pid 6089's current scheduling priority: 49
+
+sort_v1
+pi@jx98-ty293-xz785:~/lab4 $ chrt -p 7842
+pid 7842's current scheduling policy: SCHED_OTHER
+pid 7842's current scheduling priority: 0
+
+3.blink_v7
+pi@jx98-ty293-xz785:~/lab4 $ chrt -p 8536
+pid 8536's current scheduling policy: SCHED_OTHER
+pid 8536's current scheduling priority: 0
+
