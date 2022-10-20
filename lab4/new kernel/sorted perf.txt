@@ -1,0 +1,20 @@
+pi@jx98-ty293-xz785:~/lab4 $ perf_5.10 stat ./sort_v1
+size of data = 131072, size of *data = 4
+elapsed time = 4.02251
+
+ Performance counter stats for './sort_v1':
+
+          4,037.54 msec task-clock:u              #    0.973 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               109      page-faults:u             #    0.027 K/sec                  
+     6,025,450,323      cycles:u                  #    1.492 GHz                    
+    11,178,930,949      instructions:u            #    1.86  insn per cycle         
+                 0      branches:u                #    0.000 K/sec                  
+           271,295      branch-misses:u           #    0.00% of all branches        
+
+       4.148312025 seconds time elapsed
+
+       4.041940000 seconds user
+       0.000000000 seconds sys
+

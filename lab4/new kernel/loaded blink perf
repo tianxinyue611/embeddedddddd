@@ -1,0 +1,20 @@
+pi@jx98-ty293-xz785:~/lab4 $ sudo perf_5.10 stat ./test_rt_skel_v16
+Interval = 1500 loops
+^C2022-10-20 18:05:19 sigHandler: Unhandled signal 2, terminating
+
+
+ Performance counter stats for './test_rt_skel_v16':
+
+         47,463.95 msec task-clock                #    1.003 CPUs utilized          
+            45,442      context-switches          #    0.957 K/sec                  
+                 4      cpu-migrations            #    0.000 K/sec                  
+            10,351      page-faults               #    0.218 K/sec                  
+    70,979,596,002      cycles                    #    1.495 GHz                    
+    58,765,717,237      instructions              #    0.83  insn per cycle         
+                 0      branches                  #    0.000 K/sec                  
+         9,834,672      branch-misses             #    0.00% of all branches        
+
+      47.340543736 seconds time elapsed
+
+      46.452314000 seconds user
+       1.283656000 seconds sys
